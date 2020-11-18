@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"net/url"
 	"os"
 
 	"github.com/chimera-kube/chimera-admission/internal/pkg/chimera"
@@ -20,16 +19,18 @@ func startServer(c *cli.Context) error {
 	}
 
 	var wasmModulePath string
-	var err error
 
-	if chimera.IsWasmModuleLocal(wasmUri) {
-		parsedUri, err := url.Parse(wasmUri)
-		if err != nil {
-			return err
-		}
-		wasmModulePath = parsedUri.Path
-	} else {
-		wasmModulePath, err = chimera.FetchRemoteWasmModule(wasmUri)
+	moduleSource, modulePath, err := chimera.WASMModuleSource(wasmUri)
+	if err != nil {
+		return err
+	}
+
+	switch moduleSource {
+	case chimera.FileSource:
+		wasmModulePath = modulePath
+	case chimera.HTTPSource, chimera.RegistrySource:
+		var err error
+		wasmModulePath, err = chimera.FetchRemoteWASMModule(moduleSource, modulePath)
 		if err != nil {
 			return errors.Wrap(err, "Cannot download remote WASM module from OCI registry")
 		}
