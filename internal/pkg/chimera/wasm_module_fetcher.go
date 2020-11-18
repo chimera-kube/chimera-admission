@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/engineerd/wasm-to-oci/pkg/oci"
@@ -57,6 +58,7 @@ func FetchRemoteWASMModule(moduleSource ModuleSource, uri string) (string, error
 			return "", err
 		}
 	default:
+		os.Remove(wasmModule.Name())
 		return "", errors.Errorf("invalid source: %q", uri)
 	}
 	return wasmModule.Name(), nil
