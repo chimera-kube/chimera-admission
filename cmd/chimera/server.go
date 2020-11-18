@@ -59,6 +59,7 @@ func startServer(c *cli.Context) error {
 					},
 				},
 				Callback: processRequest,
+				Path:     validatePath,
 			},
 		},
 	)

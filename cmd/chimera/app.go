@@ -20,6 +20,7 @@ var (
 	apiGroups     string
 	apiVersions   string
 	resources     string
+	validatePath  string
 	wasmUri       string
 	wasmEnvVars   cli.StringSlice
 
@@ -49,6 +50,13 @@ func NewApp() *cli.App {
 				Usage:       "Admission Rule - Resources",
 				EnvVars:     []string{"AW_RESOURCES"},
 				Destination: &resources,
+			},
+			&cli.StringFlag{
+				Name:        "validate-path",
+				Value:       "/validate",
+				Usage:       "Admission Rule - Validate path",
+				EnvVars:     []string{"AW_VALIDATE_PATH"},
+				Destination: &validatePath,
 			},
 			&cli.StringFlag{
 				Name:        "wasm-uri",
