@@ -15,8 +15,7 @@ const (
 
 var (
 	admissionName = "wasm.admission.rule"
-	//TODO: change name of the env variable
-	admissionHost = os.Getenv("ADMISSION_CALLBACK_HOST")
+	admissionHost = os.Getenv("AW_CALLBACK_HOST")
 	apiGroups     string
 	apiVersions   string
 	resources     string
