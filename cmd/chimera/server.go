@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
+	chimeralib "github.com/chimera-kube/chimera-admission-library/pkg/chimera"
 	"github.com/chimera-kube/chimera-admission/internal/pkg/chimera"
-	chimeralib "github.com/chimera-kube/chimera/pkg/chimera"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
