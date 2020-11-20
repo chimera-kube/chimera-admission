@@ -59,7 +59,7 @@ func NewApp() *cli.App {
 			},
 			&cli.StringFlag{
 				Name:        "wasm-uri",
-				Usage:       "WASM URI (file:///local/some/file.wasm, http://host.com/some/file.wasm, registry://localhost:5000/project/artifact:version)",
+				Usage:       "WASM URI (file:///some/local/file.wasm, https://somehost.com/some/remote/file.wasm, registry://localhost:5000/project/artifact:some-version)",
 				EnvVars:     []string{"AW_WASM_URI"},
 				Destination: &wasmUri,
 			},
