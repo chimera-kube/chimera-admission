@@ -1,5 +1,7 @@
+BINARIES ?= chimera-admission-amd64
+
 .PHONY: chimera-admission
-chimera-admission: chimera-admission-amd64
+chimera-admission: $(BINARIES)
 
 .PHONY: phony-explicit
 
@@ -9,3 +11,7 @@ chimera-admission-%: phony-explicit
 .PHONY: run
 run:
 	sh -c 'GO111MODULE=on go run main.go'
+
+.PHONY: clean
+clean:
+	rm -f $(BINARIES)
