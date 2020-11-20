@@ -11,4 +11,5 @@ require (
 	k8s.io/api v0.18.6
 )
 
+// TODO: remove when chimera-admission-library is open to the world
 replace github.com/chimera-kube/chimera-admission-library => ../chimera-admission-library
