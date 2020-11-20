@@ -10,12 +10,12 @@ import (
 
 const (
 	admissionPort        = 8080
-	exportedEnvVarPrefix = "AW_EXPORT_"
+	exportedEnvVarPrefix = "CHIMERA_EXPORT_"
 )
 
 var (
 	admissionName = "wasm.admission.rule"
-	admissionHost = os.Getenv("AW_CALLBACK_HOST")
+	admissionHost = os.Getenv("CHIMERA_CALLBACK_HOST")
 	apiGroups     string
 	apiVersions   string
 	resources     string
@@ -33,34 +33,34 @@ func NewApp() *cli.App {
 				Name:        "api-groups",
 				Value:       "*",
 				Usage:       "Admission Rule - APIGroups",
-				EnvVars:     []string{"AW_API_GROUPS"},
+				EnvVars:     []string{"CHIMERA_API_GROUPS"},
 				Destination: &apiGroups,
 			},
 			&cli.StringFlag{
 				Name:        "api-versions",
 				Value:       "v1",
 				Usage:       "Admission Rule - APIVersions",
-				EnvVars:     []string{"AW_API_VERSIONS"},
+				EnvVars:     []string{"CHIMERA_API_VERSIONS"},
 				Destination: &apiVersions,
 			},
 			&cli.StringFlag{
 				Name:        "resources",
 				Value:       "*",
 				Usage:       "Admission Rule - Resources",
-				EnvVars:     []string{"AW_RESOURCES"},
+				EnvVars:     []string{"CHIMERA_RESOURCES"},
 				Destination: &resources,
 			},
 			&cli.StringFlag{
 				Name:        "validate-path",
 				Value:       "/validate",
 				Usage:       "Admission Rule - Validate path",
-				EnvVars:     []string{"AW_VALIDATE_PATH"},
+				EnvVars:     []string{"CHIMERA_VALIDATE_PATH"},
 				Destination: &validatePath,
 			},
 			&cli.StringFlag{
 				Name:        "wasm-uri",
-				Usage:       "WASM URI (file:///some/local/file.wasm, https://somehost.com/some/remote/file.wasm, registry://localhost:5000/project/artifact:some-version)",
-				EnvVars:     []string{"AW_WASM_URI"},
+				Usage:       "WASM URI (file:///some/local/program.wasm, https://some-host.com/some/remote/program.wasm, registry://localhost:5000/project/artifact:some-version)",
+				EnvVars:     []string{"CHIMERA_WASM_URI"},
 				Destination: &wasmUri,
 			},
 			&cli.StringSliceFlag{

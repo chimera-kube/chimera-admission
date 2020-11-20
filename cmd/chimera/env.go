@@ -17,7 +17,7 @@ func exportedEnvVar(envVar string) (string, string, error) {
 
 func computeWasmEnv() ([]string, []string) {
 	wasmEnv := map[string]string{}
-	// Inherited envvars with AW_EXPORT_ prefix: trim and forward to the WASM guest
+	// Inherited envvars with CHIMERA_EXPORT_ prefix: trim and forward to the WASM guest
 	for _, env := range os.Environ() {
 		exportVarName, exportVarValue, err := exportedEnvVar(env)
 		if err != nil {
