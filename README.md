@@ -1,66 +1,113 @@
 # chimera-admission
 
-`chimera-admission` is a program that allows you to register and run
-Kubernetes admission webhooks that will load a WASM environment to
-perform admission control dynamically.
+`chimera-admission` is a
+[Kubernetes dynamic admission controller](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
+that loads Chimera Policies to validate admission requests.
 
-## Requirements
+Chimera Policies are simple [WebAssembly](https://webassembly.org/)
+modules.
 
-For testing `chimera-admission` you need a Kubernetes cluster running
-and accessible through a `kubeconfig` file.
+> **Note well:** the Chimera Project is in its early days. Many
+> things are going to change. It's not meant to be used in production.
 
-You can start a k3s instance by downloading k3s and executing the k3s
-server in your machine, like so:
 
-```shell
-~ $ wget https://github.com/rancher/k3s/releases/download/v1.19.4%2Bk3s1/k3s
-~ $ chmod +x k3s
-~ $ ./k3s server --disable-agent
-```
+## Building
 
-## Building chimera-admission
-
-Build the `chimera-admission-amd64` binary:
+The `chimera-admission` binary can be built in this way:
 
 ```shell
+$ # Build x86_64 binary
 $ make chimera-admission-amd64
+$ # Build ARM64 binary
+$ make chimera-admission-arm64
 ```
 
 ## Running chimera-admission
 
-Run the `chimera-admission` server, that will load the provided WASM
-module, and register the admission webhook on the Kubernetes API
-automatically.
+The behaviour of `chimera-admission` can be tuned either via cli flags or
+environment variables. All the environment variables have the `CHIMERA_` prefix.
+
+### Referencing the Chimera Policy to be used
+
+> **Note well:** at this time `chimera-admission` loads only one Chimera Policy.
+> We have plans to allow users to dynamically set up Chimera Policies
+> that `chimera-admission` will discover and load as needed.
+
+The WASM file providing the Chimera Policy can be either loaded from
+the local filesystem or it can be fetched from a remote location. The behaviour
+depends on the URL format provided by the user:
+
+* `file:///some/local/program.wasm`: load the policy from the local filesystem
+* `https://some-host.com/some/remote/program.wasm`: download the policy from the
+  remote http(s) server
+* `registry://localhost:5000/project/artifact:some-version` download the policy
+  from a OCI registry. The policy must have been pushed as an OCI artifact
+
+### Policy tuning
+
+Chimera Policies can be configured via environment variables. The `chimera-admission`
+controller takes care of forwarding the environment variables from the host
+system to the WASM runtime.
+
+The controller automatically forwards all the environment variables that
+have the `CHIMERA_EXPORT_` prefix. These environment variables are forwarded
+with the `CHIMERA_EXPORT_` prefix stripped. For example, the `CHIMERA_EXPORT_ALLOWED_GROUPS`
+will be forwarded to the Chimera Policy as `ALLOWED_GROUPS`.
+
+### Kubernetes registration
+
+The `chimera-admission` controller automatically takes care of registering
+itself against the Kubernetes API server.
+
+Kubernetes requires all the dynamic admission controllers to be secured with a
+TLS certificate. The CA bundle used to generate the certificate used by the
+controller must be provided to Kubernetes when the controller is registered.
+
+The user can provide the TLS certificates and the CA bundle to use. When nothing
+is specified, `chimera-admission` will automatically generate a CA and use it
+to sign a TLS certificate.
+
+> **Note well:** right now `chimera-admission` doesn't implement certificate rotation.
+
+The `chimera-admission` will automatically register itself using the name provided
+by the user, or use a self-generated one.
+
+> **Note well:** the `ValidatingWebhookConfiguration` object is not deleted when
+> the `chimera-admission` is terminated.
+
+## Example
+
+You need a Kubernetes cluster running and accessible through a `kubeconfig` file.
+This can be done quickly using k3s.
+
+The following commands download k3s and then run it locally::
+
+```shell
+$ wget https://github.com/rancher/k3s/releases/download/v1.19.4%2Bk3s1/k3s
+$ chmod +x k3s
+$ ./k3s server --disable-agent
+```
+
+Now we can start a `chimera-admission` instance that uses
+[this Chimera Policy](https://github.com/chimera-kube/pod-toleration-policy)
+to validate Pod operations. We assume the WASM file providing the policy has already
+been downloaded on the local filesystem.
 
 ```shell
 $ CHIMERA_RESOURCES=pods \
   CHIMERA_EXPORT_TOLERATION_KEY=example-key \
   CHIMERA_EXPORT_TOLERATION_OPERATOR=Exists \
   CHIMERA_EXPORT_TOLERATION_EFFECT=NoSchedule \
-  CHIMERA_EXPORT_ALLOWED_GROUPS=system:authenticated \
+  CHIMERA_EXPORT_ALLOWED_GROUPS=system:masters \
   CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
   ./chimera-admission-amd64
 ```
 
-Currently, WASM modules can be provided to the `CHIMERA_WASM_URI`
-environment variable in three different ways:
-
-* Local filesystem: `CHIMERA_WASM_URI=file:///some/local/program.wasm`
-* HTTP(s): `CHIMERA_WASM_URI=https://some-host.com/some/remote/program.wasm`
-* OCI Registry: `CHIMERA_WASM_URI=registry://localhost:5000/project/artifact:some-version`
-
-At this time the `chimera-admission` project only loads one WASM
-program, but we have plans to allow users to dynamically set up WASM
-modules that `chimera-admission` will discover and load as needed.
-
-## Trying the loaded WASM module
-
-After you have started the `chimera-admission` server on the previous
-step, you will see that creating the following pod will be allowed:
+Now we can see the policy in action by creating the following Pod:
 
 ```shell
-~ $ k3s kubectl apply -f - <<EOF
+$ k3s kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -79,31 +126,37 @@ spec:
 EOF
 ```
 
-Remove the pod after it has been created, so we can try to see how
-it's rejected afterwards. Run:
+The `chimera-admission` instance will accept the creation request because the
+`kubeconfig` used by k3s authenticates us as user named `kubernetes-admin` who
+belongs to the `sytem:masters` and to the `system:authenticated` groups.
+
+Let's remove the Pod now, so that we can make one last test:
 
 ```shell
-~ $ k3s kubectl delete pod nginx
+$ k3s kubectl delete pod nginx
 ```
 
 Stop the previous admission server execution, and re-run it with
-exposed environment variables slightly changed, like so:
+a different tuning of the Chimera Policy:
 
 ```shell
 $ CHIMERA_RESOURCES=pods \
   CHIMERA_EXPORT_TOLERATION_KEY=example-key \
   CHIMERA_EXPORT_TOLERATION_OPERATOR=Exists \
   CHIMERA_EXPORT_TOLERATION_EFFECT=NoSchedule \
-  CHIMERA_EXPORT_ALLOWED_GROUPS=some-other-group \
+  CHIMERA_EXPORT_ALLOWED_GROUPS=trusted-users \
   CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
   ./chimera-admission-amd64
 ```
 
-Now, if you try to create the pod again you will get the following error:
+Now the policy accepts this toleration only when a user who belongs to the
+`trusted-users` group is the author of the request.
+
+Let's create the same Pod one last time:
 
 ```shell
-~ $ k3s kubectl apply -f - <<EOF
+$ k3s kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -123,7 +176,6 @@ EOF
 Error from server: error when creating "STDIN": admission webhook "rule-0.wasm.admission.rule" denied the request: User not allowed to create Pod objects with toleration: key: example-key, operator: Exists, effect: NoSchedule)
 ```
 
-This is the sample WASM program `pod-toleration-policy.wasm` rejecting
-the pod creation request, because the group in the creation request is
-not included in the allowed groups provided in the
-server `CHIMERA_EXPORT_ALLOWED_GROUPS` environment variable.
+The admission controller is properly working: the creation request has
+been rejected because it's not done by a user who belongs to one of the
+valid groups.
