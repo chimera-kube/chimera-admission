@@ -43,11 +43,11 @@ func startServer(c *cli.Context) error {
 		return err
 	}
 
-	return chimeralib.StartServer(
-		admissionName,
-		admissionHost,
-		admissionPort,
-		[]chimeralib.Webhook{
+	config := chimeralib.AdmissionConfig{
+		Name:         admissionName,
+		CallbackHost: admissionHost,
+		CallbackPort: admissionPort,
+		Webhooks: []chimeralib.Webhook{
 			{
 				Rules: []admissionregistrationv1.RuleWithOperations{
 					{
@@ -63,7 +63,13 @@ func startServer(c *cli.Context) error {
 				Path:     validatePath,
 			},
 		},
-	)
+		TLSExtraSANs: tlsExtraSANs.Value(),
+		CertFile:     certFile,
+		KeyFile:      keyFile,
+		CaFile:       caFile,
+	}
+
+	return chimeralib.StartTLSServer(config)
 }
 
 func processRequest(admissionReviewRequest *admissionv1.AdmissionRequest) (chimeralib.WebhookResponse, error) {

@@ -1,27 +1,29 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/chimera-kube/chimera-admission/internal/pkg/chimera"
 
 	"github.com/urfave/cli/v2"
 )
 
 const (
-	admissionPort        = 8080
 	exportedEnvVarPrefix = "CHIMERA_EXPORT_"
 )
 
 var (
-	admissionName = "wasm.admission.rule"
-	admissionHost = os.Getenv("CHIMERA_CALLBACK_HOST")
+	admissionName string
+	admissionHost string
+	admissionPort int
 	apiGroups     string
 	apiVersions   string
 	resources     string
 	validatePath  string
 	wasmUri       string
 	wasmEnvVars   cli.StringSlice
+	tlsExtraSANs  cli.StringSlice
+	certFile      string
+	keyFile       string
+	caFile        string
 
 	wasmWorker *chimera.WasmWorker
 )
@@ -29,6 +31,49 @@ var (
 func NewApp() *cli.App {
 	app := &cli.App{
 		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "admission-name",
+				Value:       "chimera.admission.rule",
+				Usage:       "Name used to register the admission controller against Kubernetes",
+				EnvVars:     []string{"CHIMERA_ADMISSION_NAME"},
+				Destination: &admissionName,
+			},
+			&cli.StringFlag{
+				Name:        "callback-host",
+				Usage:       "FQDN of the admission controller - must be reachable by the Kubernetes API server",
+				EnvVars:     []string{"CHIMERA_CALLBACK_HOST"},
+				Destination: &admissionHost,
+			},
+			&cli.IntFlag{
+				Name:        "callback-port",
+				Usage:       "Listening port",
+				Value:       8443,
+				EnvVars:     []string{"CHIMERA_CALLBACK_PORT"},
+				Destination: &admissionPort,
+			},
+			&cli.StringFlag{
+				Name:        "cert-file",
+				Usage:       "TLS certificate to use",
+				EnvVars:     []string{"CHIMERA_CERT_FILE"},
+				Destination: &certFile,
+			},
+			&cli.StringFlag{
+				Name:        "cert-key",
+				Usage:       "TLS key to use",
+				EnvVars:     []string{"CHIMERA_KEY_FILE"},
+				Destination: &keyFile,
+			},
+			&cli.StringFlag{
+				Name:        "ca-bundle",
+				Usage:       "CA Bundle",
+				EnvVars:     []string{"CHIMERA_CA_BUNDLE"},
+				Destination: &caFile,
+			},
+			&cli.StringSliceFlag{
+				Name:        "tls-extra-sans",
+				Usage:       "Extra TLS SANs to use when generating certificate. Can be repeated several times",
+				Destination: &tlsExtraSANs,
+			},
 			&cli.StringFlag{
 				Name:        "api-groups",
 				Value:       "*",
