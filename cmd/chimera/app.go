@@ -47,7 +47,7 @@ func NewApp() *cli.App {
 			&cli.IntFlag{
 				Name:        "callback-port",
 				Usage:       "Listening port",
-				Value:       8080,
+				Value:       8443,
 				EnvVars:     []string{"CHIMERA_CALLBACK_PORT"},
 				Destination: &admissionPort,
 			},
