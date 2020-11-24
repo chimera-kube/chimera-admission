@@ -30,7 +30,12 @@ func startServer(c *cli.Context) error {
 		wasmModulePath = modulePath
 	case chimera.HTTPSource, chimera.RegistrySource:
 		var err error
-		wasmModulePath, err = chimera.FetchRemoteWASMModule(moduleSource, modulePath)
+		wasmModulePath, err = chimera.FetchRemoteWASMModule(
+			moduleSource,
+			modulePath,
+			wasmRemoteInsecure,
+			wasmRemoteNonTLS,
+			wasmRemoteCA)
 		if err != nil {
 			return errors.Wrap(err, "Cannot download remote WASM module from OCI registry")
 		}
@@ -44,9 +49,11 @@ func startServer(c *cli.Context) error {
 	}
 
 	config := chimeralib.AdmissionConfig{
-		Name:         admissionName,
-		CallbackHost: admissionHost,
-		CallbackPort: admissionPort,
+		Name:          admissionName,
+		CallbackHost:  admissionHost,
+		CallbackPort:  admissionPort,
+		KubeNamespace: kubeNamespace,
+		KubeService:   kubeService,
 		Webhooks: []chimeralib.Webhook{
 			{
 				Rules: []admissionregistrationv1.RuleWithOperations{
@@ -59,8 +66,9 @@ func startServer(c *cli.Context) error {
 						},
 					},
 				},
-				Callback: processRequest,
-				Path:     validatePath,
+				Callback:      processRequest,
+				Path:          validatePath,
+				FailurePolicy: admissionregistrationv1.Ignore,
 			},
 		},
 		TLSExtraSANs: tlsExtraSANs.Value(),

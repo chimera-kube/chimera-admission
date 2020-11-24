@@ -11,19 +11,24 @@ const (
 )
 
 var (
-	admissionName string
-	admissionHost string
-	admissionPort int
-	apiGroups     string
-	apiVersions   string
-	resources     string
-	validatePath  string
-	wasmUri       string
-	wasmEnvVars   cli.StringSlice
-	tlsExtraSANs  cli.StringSlice
-	certFile      string
-	keyFile       string
-	caFile        string
+	admissionName      string
+	admissionHost      string
+	admissionPort      int
+	kubeNamespace      string
+	kubeService        string
+	apiGroups          string
+	apiVersions        string
+	resources          string
+	validatePath       string
+	wasmUri            string
+	wasmRemoteCA       string
+	wasmRemoteInsecure bool
+	wasmRemoteNonTLS   bool
+	wasmEnvVars        cli.StringSlice
+	tlsExtraSANs       cli.StringSlice
+	certFile           string
+	keyFile            string
+	caFile             string
 
 	wasmWorker *chimera.WasmWorker
 )
@@ -50,6 +55,18 @@ func NewApp() *cli.App {
 				Value:       8443,
 				EnvVars:     []string{"CHIMERA_CALLBACK_PORT"},
 				Destination: &admissionPort,
+			},
+			&cli.StringFlag{
+				Name:        "kube-namespace",
+				Usage:       "The namespace that contains the chimera-admission service",
+				EnvVars:     []string{"CHIMERA_KUBE_NAMESPACE"},
+				Destination: &kubeNamespace,
+			},
+			&cli.StringFlag{
+				Name:        "kube-service",
+				Usage:       "The name of the kubernetes service exposing chimera-admission",
+				EnvVars:     []string{"CHIMERA_KUBE_SERVICE"},
+				Destination: &kubeService,
 			},
 			&cli.StringFlag{
 				Name:        "cert-file",
@@ -107,6 +124,26 @@ func NewApp() *cli.App {
 				Usage:       "WASM URI (file:///some/local/program.wasm, https://some-host.com/some/remote/program.wasm, registry://localhost:5000/project/artifact:some-version)",
 				EnvVars:     []string{"CHIMERA_WASM_URI"},
 				Destination: &wasmUri,
+			},
+			&cli.StringFlag{
+				Name:        "wasm-remote-ca",
+				Usage:       "CA used by the remote location hosting the WASM module",
+				EnvVars:     []string{"CHIMERA_WASM_REMOTE_CA"},
+				Destination: &wasmRemoteCA,
+			},
+			&cli.BoolFlag{
+				Name:        "wasm-remote-non-tls",
+				Usage:       "WASM remote endpoint is not using TLS. False by default",
+				EnvVars:     []string{"CHIMERA_WASM_REMOTE_NON_TLS"},
+				Value:       false,
+				Destination: &wasmRemoteNonTLS,
+			},
+			&cli.BoolFlag{
+				Name:        "wasm-remote-insecure",
+				Usage:       "Do not verify remote TLS certificate. False by default",
+				EnvVars:     []string{"CHIMERA_WASM_REMOTE_INSECURE"},
+				Value:       false,
+				Destination: &wasmRemoteInsecure,
 			},
 			&cli.StringSliceFlag{
 				Name:        "env",
