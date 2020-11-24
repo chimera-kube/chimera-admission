@@ -95,9 +95,8 @@ been downloaded on the local filesystem.
 
 ```shell
 $ CHIMERA_RESOURCES=pods \
-  CHIMERA_EXPORT_TOLERATION_KEY=example-key \
-  CHIMERA_EXPORT_TOLERATION_OPERATOR=Exists \
-  CHIMERA_EXPORT_TOLERATION_EFFECT=NoSchedule \
+  CHIMERA_EXPORT_TAINT_KEY=dedicated \
+  CHIMERA_EXPORT_TAINT_VALUE=tenantA \
   CHIMERA_EXPORT_ALLOWED_GROUPS=system:masters \
   CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
@@ -120,8 +119,9 @@ spec:
     image: nginx
     imagePullPolicy: IfNotPresent
   tolerations:
-  - key: "example-key"
-    operator: "Exists"
+  - key: "dedicated"
+    operator: "Equal"
+    value: "tenantA"
     effect: "NoSchedule"
 EOF
 ```
@@ -141,9 +141,8 @@ a different tuning of the Chimera Policy:
 
 ```shell
 $ CHIMERA_RESOURCES=pods \
-  CHIMERA_EXPORT_TOLERATION_KEY=example-key \
-  CHIMERA_EXPORT_TOLERATION_OPERATOR=Exists \
-  CHIMERA_EXPORT_TOLERATION_EFFECT=NoSchedule \
+  CHIMERA_EXPORT_TAINT_KEY=dedicated \
+  CHIMERA_EXPORT_TAINT_VALUE=tenantA \
   CHIMERA_EXPORT_ALLOWED_GROUPS=trusted-users \
   CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
