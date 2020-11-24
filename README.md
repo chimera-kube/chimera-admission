@@ -80,7 +80,7 @@ by the user, or use a self-generated one.
 You need a Kubernetes cluster running and accessible through a `kubeconfig` file.
 This can be done quickly using k3s.
 
-The following commands download k3s and then run it locally::
+The following commands download k3s and then run it locally:
 
 ```shell
 $ wget https://github.com/rancher/k3s/releases/download/v1.19.4%2Bk3s1/k3s
