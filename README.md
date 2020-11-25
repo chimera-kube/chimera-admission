@@ -9,20 +9,21 @@ modules.
 
 > **Note well:** the Chimera Project is in its early days. Many
 > things are going to change. It's not meant to be used in production.
-
-
-## Building
-
-The `chimera-admission` binary can be built in this way:
-
-```shell
-$ # Build x86_64 binary
-$ make chimera-admission-amd64
-$ # Build ARM64 binary
-$ make chimera-admission-arm64
-```
+>
+> We also plan to create a Kubernetes controller to simplify the management
+> of Chimera Policies.
 
 ## Running chimera-admission
+
+You can either build `chimera-admission` from sources (see the dedicated section
+near the bottom of the file) or you can use the container image we maintain
+inside of our [GitHub Container Registry](https://github.com/orgs/chimera-kube/packages/container/package/chimera-admission).
+
+The [`deployment`](https://github.com/chimera-kube/chimera-admission/tree/main/deployment)
+directory inside of this repository shows how to deploy `chimera-admission`
+on top of a Kubernetes cluster.
+
+## Configuring chimera-admission
 
 The behaviour of `chimera-admission` can be tuned either via cli flags or
 environment variables. All the environment variables have the `CHIMERA_` prefix.
@@ -90,15 +91,17 @@ $ ./k3s server --disable-agent
 
 Now we can start a `chimera-admission` instance that uses
 [this Chimera Policy](https://github.com/chimera-kube/pod-toleration-policy)
-to validate Pod operations. We assume the WASM file providing the policy has already
-been downloaded on the local filesystem.
+to validate Pod operations.
+
+The policy will be downloaded from
+[here](https://github.com/orgs/chimera-kube/packages/container/package/policies%2Fpod-toleration).
 
 ```shell
 $ CHIMERA_RESOURCES=pods \
   CHIMERA_EXPORT_TAINT_KEY=dedicated \
   CHIMERA_EXPORT_TAINT_VALUE=tenantA \
   CHIMERA_EXPORT_ALLOWED_GROUPS=system:masters \
-  CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
+  CHIMERA_WASM_URI=registry://ghcr.io/chimera-kube/policies/pod-toleration:v0.0.2 \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
   ./chimera-admission-amd64
 ```
@@ -144,7 +147,7 @@ $ CHIMERA_RESOURCES=pods \
   CHIMERA_EXPORT_TAINT_KEY=dedicated \
   CHIMERA_EXPORT_TAINT_VALUE=tenantA \
   CHIMERA_EXPORT_ALLOWED_GROUPS=trusted-users \
-  CHIMERA_WASM_URI=file://$PWD/wasm-examples/pod-toleration-policy/pod-toleration-policy.wasm \
+  CHIMERA_WASM_URI=registry://ghcr.io/chimera-kube/policies/pod-toleration:v0.0.2 \
   KUBECONFIG=$HOME/.kube/k3s.yaml \
   ./chimera-admission-amd64
 ```
@@ -178,3 +181,12 @@ Error from server: error when creating "STDIN": admission webhook "rule-0.wasm.a
 The admission controller is properly working: the creation request has
 been rejected because it's not done by a user who belongs to one of the
 valid groups.
+
+## Building
+
+The `chimera-admission` binary can be built in this way:
+
+```shell
+$ # Build x86_64 binary
+$ make chimera-admission-amd64
+```
