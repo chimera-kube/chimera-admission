@@ -8,11 +8,12 @@ on:
 name: build container image
 
 jobs:
-  build-from-main:
+  build:
+    name: Build container image
     runs-on: ubuntu-latest
     steps:
       -
-        name: Checkout
+        name: Checkout code
         uses: actions/checkout@v2
       -
         name: Set up QEMU
