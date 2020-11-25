@@ -66,9 +66,12 @@ func startServer(c *cli.Context) error {
 						},
 					},
 				},
-				Callback:      processRequest,
-				Path:          validatePath,
-				FailurePolicy: admissionregistrationv1.Ignore,
+				Callback: processRequest,
+				Path:     validatePath,
+				// Despite it is the default in the apiserver when registering if
+				// missing, make it explicit that the failure policy is fail -- if
+				// the webhook cannot be contacted, the request will be rejected
+				FailurePolicy: admissionregistrationv1.Fail,
 			},
 		},
 		TLSExtraSANs: tlsExtraSANs.Value(),
