@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chimera
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chimera
+  namespace: chimera
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manage-validating-webhook-configurations
+rules:
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: chimera-manage-validating-webhook-configurations
+subjects:
+- kind: ServiceAccount
+  name: chimera
+  namespace: chimera
+roleRef:
+  kind: ClusterRole
+  name: manage-validating-webhook-configurations
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chimera-admission
+  namespace: chimera
+  labels:
+    app: chimera-admission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chimera-admission
+  template:
+    metadata:
+      labels:
+        app: chimera-admission
+    spec:
+      serviceAccountName: chimera
+      containers:
+      - image: ghcr.io/chimera-kube/chimera-admission:v0.0.1
+        name: chimera-admission
+        env:
+        - name: CHIMERA_KUBE_NAMESPACE
+          value: chimera
+        - name: CHIMERA_KUBE_SERVICE
+          value: chimera-admission
+        - name: CHIMERA_CALLBACK_HOST
+          value: chimera-admission.chimera.svc
+        - name: CHIMERA_RESOURCES
+          value: pods
+        - name: CHIMERA_WASM_URI
+          value: registry://ghcr.io/chimera-kube/policies/pod-toleration:v0.0.2
+        - name: CHIMERA_EXPORT_TAINT_KEY
+          value: dedicated
+        - name: CHIMERA_EXPORT_TAINT_VALUE
+          value: tenantA
+        - name: CHIMERA_EXPORT_ALLOWED_GROUPS
+          value: tenantA-users
+        securityContext:
+          runAsUser: 2000
+          runAsNonRoot: true
+          privileged: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chimera-admission
+  namespace: chimera
+  labels:
+    name: chimera-admission
+spec:
+  ports:
+    - port: 8443
+      targetPort: 8443
+  selector:
+    app: chimera-admission
