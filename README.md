@@ -1,4 +1,4 @@
-> **Note well:** don't forget to checkout [chimera's documentation](https://chimera-kube.github.io/chimera-book/)
+> **Note well:** don't forget to checkout [Chimera's documentation](https://chimera-kube.github.io/chimera-book/)
 > for more information
 
 # chimera-admission
@@ -9,6 +9,12 @@ that loads Chimera Policies to validate admission requests.
 
 Chimera Policies are simple [WebAssembly](https://webassembly.org/)
 modules.
+
+chimera-admission can be deployed by doing a simple:
+
+```shell
+$ kubectl apply -f https://raw.githubusercontent.com/chimera-kube/chimera-admission/main/deployment/chimera-admission.yaml
+```
 
 > **Note well:** the Chimera Project is in its early days. Many
 > things are going to change. It's not meant to be used in production.
@@ -96,7 +102,7 @@ Now we can start a `chimera-admission` instance that uses
 [this Chimera Policy](https://github.com/chimera-kube/pod-toleration-policy)
 to validate Pod operations.
 
-The policy will be downloaded from
+The policy will be downloaded as an OCI artifact from
 [here](https://github.com/orgs/chimera-kube/packages/container/package/policies%2Fpod-toleration).
 
 ```shell
