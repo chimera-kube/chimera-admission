@@ -1,3 +1,6 @@
+> **Note well:** don't forget to checkout [chimera's documentation](https://chimera-kube.github.io/chimera-book/)
+> for more information
+
 # chimera-admission
 
 `chimera-admission` is a
