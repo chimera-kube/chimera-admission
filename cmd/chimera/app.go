@@ -121,19 +121,19 @@ func NewApp() *cli.App {
 			},
 			&cli.StringFlag{
 				Name:        "wasm-uri",
-				Usage:       "WASM URI (file:///some/local/program.wasm, https://some-host.com/some/remote/program.wasm, registry://localhost:5000/project/artifact:some-version)",
+				Usage:       "Wasm URI (file:///some/local/program.wasm, https://some-host.com/some/remote/program.wasm, registry://localhost:5000/project/artifact:some-version)",
 				EnvVars:     []string{"CHIMERA_WASM_URI"},
 				Destination: &wasmUri,
 			},
 			&cli.StringFlag{
 				Name:        "wasm-remote-ca",
-				Usage:       "CA used by the remote location hosting the WASM module",
+				Usage:       "CA used by the remote location hosting the Wasm module",
 				EnvVars:     []string{"CHIMERA_WASM_REMOTE_CA"},
 				Destination: &wasmRemoteCA,
 			},
 			&cli.BoolFlag{
 				Name:        "wasm-remote-non-tls",
-				Usage:       "WASM remote endpoint is not using TLS. False by default",
+				Usage:       "Wasm remote endpoint is not using TLS. False by default",
 				EnvVars:     []string{"CHIMERA_WASM_REMOTE_NON_TLS"},
 				Value:       false,
 				Destination: &wasmRemoteNonTLS,
@@ -147,7 +147,7 @@ func NewApp() *cli.App {
 			},
 			&cli.StringSliceFlag{
 				Name:        "env",
-				Usage:       "Admission Rule - Export environment variable on the guest WASM module (VAR=value), can be repeated several times",
+				Usage:       "Admission Rule - Export environment variable on the guest Wasm module (VAR=value), can be repeated several times",
 				Destination: &wasmEnvVars,
 			},
 		},

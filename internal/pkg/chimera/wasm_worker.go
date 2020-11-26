@@ -50,7 +50,7 @@ func NewWasmWorker(pathToWasmModule string, envKeys, envValues []string) (*WasmW
 		os.Remove(stdinWasm.Name())
 		os.Remove(stdoutWasm.Name())
 
-		return nil, errors.Wrap(err, "Cannot initialize WASM stack")
+		return nil, errors.Wrap(err, "Cannot initialize Wasm stack")
 	}
 	worker.stack = stack
 
@@ -63,30 +63,30 @@ func (w *WasmWorker) ProcessRequest(request []byte) (ValidationResponse, error) 
 
 	response := ValidationResponse{}
 
-	// setup WASM stdin
+	// setup Wasm stdin
 	if err := os.Truncate(w.stdinWasmPath, 0); err != nil {
-		return response, errors.Wrap(err, "Cannot truncate WASM stdin file")
+		return response, errors.Wrap(err, "Cannot truncate Wasm stdin file")
 	}
 	if err := ioutil.WriteFile(w.stdinWasmPath, request, 0400); err != nil {
-		return response, errors.Wrap(err, "Cannot populate WASM stdin file")
+		return response, errors.Wrap(err, "Cannot populate Wasm stdin file")
 	}
 
-	// setup WASM stdout
+	// setup Wasm stdout
 	if err := os.Truncate(w.stdoutWasmPath, 0); err != nil {
-		return response, errors.Wrap(err, "Cannot truncate WASM stdin file")
+		return response, errors.Wrap(err, "Cannot truncate Wasm stdin file")
 	}
 
 	if err := w.stack.Run(); err != nil {
-		return response, errors.Wrap(err, "Cannot run the WASM code")
+		return response, errors.Wrap(err, "Cannot run the Wasm code")
 	}
 
 	stdout, err := ioutil.ReadFile(w.stdoutWasmPath)
 	if err != nil {
-		return response, errors.Wrap(err, "Cannot read WASM stdout")
+		return response, errors.Wrap(err, "Cannot read Wasm stdout")
 	}
 
 	if err := json.Unmarshal(stdout, &response); err != nil {
-		return response, errors.Wrap(err, "Cannot decode WASM code response")
+		return response, errors.Wrap(err, "Cannot decode Wasm code response")
 	}
 
 	return response, nil

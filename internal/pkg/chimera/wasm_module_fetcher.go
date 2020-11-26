@@ -24,7 +24,7 @@ const (
 	RegistrySource ModuleSource = iota
 )
 
-func WASMModuleSource(uri string) (ModuleSource, string, error) {
+func WasmModuleSource(uri string) (ModuleSource, string, error) {
 	parsedUri, err := url.Parse(uri)
 	if err != nil {
 		return UnknownSource, "", errors.Errorf("invalid source: %q", uri)
@@ -41,7 +41,7 @@ func WASMModuleSource(uri string) (ModuleSource, string, error) {
 	return FileSource, "", errors.Errorf("unknown scheme %q", parsedUri.Scheme)
 }
 
-func FetchRemoteWASMModule(moduleSource ModuleSource, uri string, insecure, nonTLS bool, caPath string) (string, error) {
+func FetchRemoteWasmModule(moduleSource ModuleSource, uri string, insecure, nonTLS bool, caPath string) (string, error) {
 	wasmModule, err := ioutil.TempFile("", "wasm-module-*")
 	if err != nil {
 		return "", err
@@ -58,12 +58,12 @@ func FetchRemoteWASMModule(moduleSource ModuleSource, uri string, insecure, nonT
 		resp, err := client.Get(uri)
 		if err != nil {
 			os.Remove(wasmModule.Name())
-			return "", errors.Errorf("could not download WASM module from %q: %v", uri, err)
+			return "", errors.Errorf("could not download Wasm module from %q: %v", uri, err)
 		}
 		defer resp.Body.Close()
 		if _, err := io.Copy(wasmModule, resp.Body); err != nil {
 			os.Remove(wasmModule.Name())
-			return "", errors.Errorf("could not download WASM module from %q: %v", uri, err)
+			return "", errors.Errorf("could not download Wasm module from %q: %v", uri, err)
 		}
 	case RegistrySource:
 		if caPath != "" {

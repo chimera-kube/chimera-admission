@@ -43,7 +43,7 @@ environment variables. All the environment variables have the `CHIMERA_` prefix.
 > We have plans to allow users to dynamically set up Chimera Policies
 > that `chimera-admission` will discover and load as needed.
 
-The WASM file providing the Chimera Policy can be either loaded from
+The Wasm file providing the Chimera Policy can be either loaded from
 the local filesystem or it can be fetched from a remote location. The behaviour
 depends on the URL format provided by the user:
 
@@ -57,7 +57,7 @@ depends on the URL format provided by the user:
 
 Chimera Policies can be configured via environment variables. The `chimera-admission`
 controller takes care of forwarding the environment variables from the host
-system to the WASM runtime.
+system to the Wasm runtime.
 
 The controller automatically forwards all the environment variables that
 have the `CHIMERA_EXPORT_` prefix. These environment variables are forwarded

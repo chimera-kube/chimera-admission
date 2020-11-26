@@ -15,12 +15,12 @@ import (
 
 func startServer(c *cli.Context) error {
 	if wasmUri == "" {
-		return errors.New("Please, provide a WASM URI to load")
+		return errors.New("Please, provide a Wasm URI to load")
 	}
 
 	var wasmModulePath string
 
-	moduleSource, modulePath, err := chimera.WASMModuleSource(wasmUri)
+	moduleSource, modulePath, err := chimera.WasmModuleSource(wasmUri)
 	if err != nil {
 		return err
 	}
@@ -30,14 +30,14 @@ func startServer(c *cli.Context) error {
 		wasmModulePath = modulePath
 	case chimera.HTTPSource, chimera.RegistrySource:
 		var err error
-		wasmModulePath, err = chimera.FetchRemoteWASMModule(
+		wasmModulePath, err = chimera.FetchRemoteWasmModule(
 			moduleSource,
 			modulePath,
 			wasmRemoteInsecure,
 			wasmRemoteNonTLS,
 			wasmRemoteCA)
 		if err != nil {
-			return errors.Wrap(err, "Cannot download remote WASM module from OCI registry")
+			return errors.Wrap(err, "Cannot download remote Wasm module from OCI registry")
 		}
 		defer os.Remove(wasmModulePath)
 	}

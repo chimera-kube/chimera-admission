@@ -48,7 +48,7 @@ we push automatically to our GitHub Container Registry.
 The admission controller uses the [pod-toleration](https://github.com/chimera-kube/pod-toleration-policy)
 policy to validate incoming Pod requests.
 
-The controller will download the WASM module providing the policy from
+The controller will download the Wasm module providing the policy from
 [here](https://github.com/orgs/chimera-kube/packages/container/package/policies%2Fpod-toleration).
 
 The Chimera Policy is automatically publish by a GitHub Action as an OCI
