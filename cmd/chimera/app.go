@@ -16,9 +16,10 @@ var (
 	admissionPort      int
 	kubeNamespace      string
 	kubeService        string
-	apiGroups          string
-	apiVersions        string
-	resources          string
+	apiGroups          cli.StringSlice
+	apiVersions        cli.StringSlice
+	resources          cli.StringSlice
+	operations         cli.StringSlice
 	validatePath       string
 	wasmUri            string
 	wasmRemoteCA       string
@@ -91,26 +92,33 @@ func NewApp() *cli.App {
 				Usage:       "Extra TLS SANs to use when generating certificate. Can be repeated several times",
 				Destination: &tlsExtraSANs,
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:        "api-groups",
-				Value:       "*",
+				Value:       cli.NewStringSlice("*"),
 				Usage:       "Admission Rule - APIGroups",
 				EnvVars:     []string{"CHIMERA_API_GROUPS"},
 				Destination: &apiGroups,
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:        "api-versions",
-				Value:       "v1",
+				Value:       cli.NewStringSlice("v1"),
 				Usage:       "Admission Rule - APIVersions",
 				EnvVars:     []string{"CHIMERA_API_VERSIONS"},
 				Destination: &apiVersions,
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:        "resources",
-				Value:       "*",
+				Value:       cli.NewStringSlice("*"),
 				Usage:       "Admission Rule - Resources",
 				EnvVars:     []string{"CHIMERA_RESOURCES"},
 				Destination: &resources,
+			},
+			&cli.StringSliceFlag{
+				Name:        "operations",
+				Value:       cli.NewStringSlice("*"),
+				Usage:       "Admission Rule - Operations",
+				EnvVars:     []string{"CHIMERA_OPERATIONS"},
+				Destination: &operations,
 			},
 			&cli.StringFlag{
 				Name:        "validate-path",

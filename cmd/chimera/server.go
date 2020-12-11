@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"os"
+	"strings"
 
 	chimeralib "github.com/chimera-kube/chimera-admission-library/pkg/chimera"
 	"github.com/chimera-kube/chimera-admission/internal/pkg/chimera"
@@ -48,6 +49,39 @@ func startServer(c *cli.Context) error {
 		return err
 	}
 
+	operationTypes := []admissionregistrationv1.OperationType{}
+	for _, operation := range operations.Value() {
+		switch strings.ToUpper(operation) {
+		case "*":
+			operationTypes = append(
+				operationTypes,
+				admissionregistrationv1.OperationAll,
+			)
+		case "CREATE":
+			operationTypes = append(
+				operationTypes,
+				admissionregistrationv1.Create,
+			)
+		case "UPDATE":
+			operationTypes = append(
+				operationTypes,
+				admissionregistrationv1.Update,
+			)
+		case "DELETE":
+			operationTypes = append(
+				operationTypes,
+				admissionregistrationv1.Delete,
+			)
+		case "CONNECT":
+			operationTypes = append(
+				operationTypes,
+				admissionregistrationv1.Connect,
+			)
+		default:
+			continue
+		}
+	}
+
 	config := chimeralib.AdmissionConfig{
 		Name:          admissionName,
 		CallbackHost:  admissionHost,
@@ -58,11 +92,11 @@ func startServer(c *cli.Context) error {
 			{
 				Rules: []admissionregistrationv1.RuleWithOperations{
 					{
-						Operations: []admissionregistrationv1.OperationType{admissionregistrationv1.OperationAll},
+						Operations: operationTypes,
 						Rule: admissionregistrationv1.Rule{
-							APIGroups:   []string{apiGroups},
-							APIVersions: []string{apiVersions},
-							Resources:   []string{resources},
+							APIGroups:   apiGroups.Value(),
+							APIVersions: apiVersions.Value(),
+							Resources:   resources.Value(),
 						},
 					},
 				},

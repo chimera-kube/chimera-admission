@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/chimera-kube/chimera-admission/cmd/chimera"
+	cmd "github.com/chimera-kube/chimera-admission/cmd/chimera"
 )
 
 func main() {
