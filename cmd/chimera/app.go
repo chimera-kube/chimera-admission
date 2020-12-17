@@ -11,25 +11,26 @@ const (
 )
 
 var (
-	admissionName      string
-	admissionHost      string
-	admissionPort      int
-	kubeNamespace      string
-	kubeService        string
-	apiGroups          cli.StringSlice
-	apiVersions        cli.StringSlice
-	resources          cli.StringSlice
-	operations         cli.StringSlice
-	validatePath       string
-	wasmUri            string
-	wasmRemoteCA       string
-	wasmRemoteInsecure bool
-	wasmRemoteNonTLS   bool
-	wasmEnvVars        cli.StringSlice
-	tlsExtraSANs       cli.StringSlice
-	certFile           string
-	keyFile            string
-	caFile             string
+	admissionName             string
+	skipAdmissionRegistration bool
+	admissionHost             string
+	admissionPort             int
+	kubeNamespace             string
+	kubeService               string
+	apiGroups                 cli.StringSlice
+	apiVersions               cli.StringSlice
+	resources                 cli.StringSlice
+	operations                cli.StringSlice
+	validatePath              string
+	wasmUri                   string
+	wasmRemoteCA              string
+	wasmRemoteInsecure        bool
+	wasmRemoteNonTLS          bool
+	wasmEnvVars               cli.StringSlice
+	tlsExtraSANs              cli.StringSlice
+	certFile                  string
+	keyFile                   string
+	caFile                    string
 
 	wasmWorker *chimera.WasmWorker
 )
@@ -43,6 +44,13 @@ func NewApp() *cli.App {
 				Usage:       "Name used to register the admission controller against Kubernetes",
 				EnvVars:     []string{"CHIMERA_ADMISSION_NAME"},
 				Destination: &admissionName,
+			},
+			&cli.BoolFlag{
+				Name:        "skip-admission-registration",
+				Value:       false,
+				Usage:       "Skips the admission registration on the Kubernetes API",
+				EnvVars:     []string{"CHIMERA_SKIP_ADMISSION_REGISTRATION"},
+				Destination: &skipAdmissionRegistration,
 			},
 			&cli.StringFlag{
 				Name:        "callback-host",

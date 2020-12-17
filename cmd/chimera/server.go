@@ -105,10 +105,11 @@ func startServer(c *cli.Context) error {
 				FailurePolicy: admissionregistrationv1.Ignore,
 			},
 		},
-		TLSExtraSANs: tlsExtraSANs.Value(),
-		CertFile:     certFile,
-		KeyFile:      keyFile,
-		CaFile:       caFile,
+		TLSExtraSANs:              tlsExtraSANs.Value(),
+		CertFile:                  certFile,
+		KeyFile:                   keyFile,
+		CaFile:                    caFile,
+		SkipAdmissionRegistration: skipAdmissionRegistration,
 	}
 
 	return chimeralib.StartTLSServer(config)
