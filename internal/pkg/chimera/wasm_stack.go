@@ -40,8 +40,8 @@ func (stack *WasmStack) Run() error {
 	wasiCfg.InheritArgv()
 	wasiCfg.InheritStderr()
 	wasiCfg.SetEnv(stack.envKeys, stack.envValues)
-	wasiCfg.SetStdinFile(stack.stdin)
-	wasiCfg.SetStdoutFile(stack.stdout)
+	_ = wasiCfg.SetStdinFile(stack.stdin)
+	_ = wasiCfg.SetStdoutFile(stack.stdout)
 
 	//TODO: do not link against this hard coded value
 	// inspect the object and find the right wasi snapshot
