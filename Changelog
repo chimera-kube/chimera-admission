@@ -1,0 +1,8 @@
+Wed Jan 13 14:51:04 CET 2021  Flavio Castelli <flavio@castelli.me>
+
+	* Update to release 0.0.2:
+		- Add flag to disable automatic registration against the Kubernetes API
+		server
+		- Add 'insecure' flag: useful to perform benchmarking
+		- Better handling of log messages, by default log only Info and Error
+		messages. Added a 'debug' flag to be more verbose
