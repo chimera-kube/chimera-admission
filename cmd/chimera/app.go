@@ -174,6 +174,11 @@ func NewApp() *cli.App {
 				Usage:       "Admission Rule - Export environment variable on the guest Wasm module (VAR=value), can be repeated several times",
 				Destination: &wasmEnvVars,
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "Enable debug output",
+				Value: false,
+			},
 		},
 		Action: startServer,
 	}

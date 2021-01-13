@@ -82,6 +82,7 @@ func startServer(c *cli.Context) error {
 		}
 	}
 
+	log := chimera.NewLogger(c.Bool("debug"))
 	config := chimeralib.AdmissionConfig{
 		Name:          admissionName,
 		CallbackHost:  admissionHost,
@@ -110,6 +111,7 @@ func startServer(c *cli.Context) error {
 		KeyFile:                   keyFile,
 		CaFile:                    caFile,
 		SkipAdmissionRegistration: skipAdmissionRegistration,
+		Log:                       &log,
 	}
 
 	return chimeralib.StartServer(&config, insecureServer)
