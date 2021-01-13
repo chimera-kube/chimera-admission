@@ -112,7 +112,7 @@ func startServer(c *cli.Context) error {
 		SkipAdmissionRegistration: skipAdmissionRegistration,
 	}
 
-	return chimeralib.StartTLSServer(&config)
+	return chimeralib.StartServer(&config, insecureServer)
 }
 
 func processRequest(admissionReviewRequest *admissionv1.AdmissionRequest) (chimeralib.WebhookResponse, error) {

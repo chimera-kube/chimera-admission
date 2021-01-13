@@ -31,6 +31,7 @@ var (
 	certFile                  string
 	keyFile                   string
 	caFile                    string
+	insecureServer            bool
 
 	wasmWorker *chimera.WasmWorker
 )
@@ -38,6 +39,13 @@ var (
 func NewApp() *cli.App {
 	app := &cli.App{
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:        "insecure-server",
+				Value:       false,
+				Usage:       "Start insecure HTTP server",
+				EnvVars:     []string{"CHIMERA_INSECURE_SERVER"},
+				Destination: &insecureServer,
+			},
 			&cli.StringFlag{
 				Name:        "admission-name",
 				Value:       "chimera.admission.rule",
