@@ -19,6 +19,10 @@ func startServer(c *cli.Context) error {
 		return errors.New("Please, provide a Wasm URI to load")
 	}
 
+	if fp := strings.ToLower(failurePolicy); fp != "ignore" && fp != "fail" {
+		return errors.New("FailurePolicy must be \"Ignore\" or \"Fail\"")
+	}
+
 	var wasmModulePath string
 
 	moduleSource, modulePath, err := chimera.WasmModuleSource(wasmUri)
@@ -103,7 +107,7 @@ func startServer(c *cli.Context) error {
 				},
 				Callback:      processRequest,
 				Path:          validatePath,
-				FailurePolicy: admissionregistrationv1.Ignore,
+				FailurePolicy: admissionregistrationv1.FailurePolicyType(failurePolicy),
 			},
 		},
 		TLSExtraSANs:              tlsExtraSANs.Value(),
