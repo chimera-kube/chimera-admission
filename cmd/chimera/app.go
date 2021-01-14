@@ -32,6 +32,7 @@ var (
 	keyFile                   string
 	caFile                    string
 	insecureServer            bool
+	failurePolicy             string
 
 	wasmWorker *chimera.WasmWorker
 )
@@ -72,6 +73,13 @@ func NewApp() *cli.App {
 				Value:       8443,
 				EnvVars:     []string{"CHIMERA_CALLBACK_PORT"},
 				Destination: &admissionPort,
+			},
+			&cli.StringFlag{
+				Name:        "failure-policy",
+				Value:       "Ignore",
+				Usage:       "Admission controller failure policy, allowed values are Ignored (request is allowed to continue if webhook cannot be reached) or Fail (request is rejected if webhook cannot be reached), defaults to Ignore",
+				EnvVars:     []string{"CHIMERA_FAILURE_POLICY"},
+				Destination: &failurePolicy,
 			},
 			&cli.StringFlag{
 				Name:        "kube-namespace",
