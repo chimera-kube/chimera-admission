@@ -1,5 +1,4 @@
-> **Note well:** don't forget to checkout [Chimera's documentation](https://chimera-kube.github.io/chimera-book/)
-> for more information
+> This project has been archived since we moved to the new [policy server](https://github.com/chimera-kube/policy-server)
 
 # chimera-admission
 
